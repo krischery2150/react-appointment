@@ -16,7 +16,20 @@ var Appointments = React.createClass({
       var appointment = { title: this.state.title, appt_time: this.state.appt_time };
       $.post('/appointments',
              {appointment: appointment})
+        .done(function(data){
+            this.addNewAppointment(data);
+        }.bind(this));
     },
+    
+
+  addNewAppointment: function(appointment) {
+    var appointments = React.addons.update(this.state.appointments, { $push: [appointment]});
+    this.setState({
+      appointments: appointments.sort(function(a,b){
+        return new Date(a.appt_time) - new Date(b.appt_time);
+      }) // Updating state and sorting from appointment time ascending
+    });
+  },
     
     render (){
         return(
@@ -26,7 +39,7 @@ var Appointments = React.createClass({
                  input_appt_time={this.state.appt_time}
                  onUserInput={this.handleUserInput}
                  onFormSubmit={this.handleFormSubmit}/>
-                <AppointmentList appointments={this.props.appointments}/>
+                <AppointmentList appointments={this.state.appointments}/>
             </div>
         )
     }
